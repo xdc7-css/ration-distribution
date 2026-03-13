@@ -1,94 +1,140 @@
-# نظام توزيع المواد الغذائية
+نظام توزيع المواد الغذائية
 
-تطبيق إداري خاص لإدارة توزيع المواد الغذائية على العوائل باستخدام **Next.js App Router + TypeScript + Tailwind CSS + Supabase + SheetJS**.
+هذا مشروع لوحة تحكم إدارية لإدارة عملية توزيع المواد الغذائية على العوائل.
+النظام مبني باستخدام Next.js (App Router) مع TypeScript وTailwind CSS مع الاعتماد على Supabase كخدمة قاعدة البيانات والمصادقة، إضافة إلى SheetJS لتوليد ملفات Excel الخاصة بالتقارير.
 
-## المزايا
+الفكرة الأساسية من النظام هي توفير واجهة بسيطة للإدارة تسمح بإدارة العوائل والمواد الغذائية وتسجيل عمليات التوزيع الشهرية، مع الاحتفاظ بسجل تاريخي لكل عملية تسليم بحيث يمكن الرجوع إليها لاحقاً دون التأثير على البيانات الأصلية.
 
-- تسجيل دخول إداري فقط عبر Supabase Auth
-- واجهة عربية RTL بتصميم حديث وناعم
-- إدارة العوائل والمواد
-- توزيع شهري مع حساب تلقائي للمواد
-- حفظ السجلات كـ historical snapshots
-- تقارير شهرية وسجل لكل عائلة
-- تصدير Excel كامل أو جزئي عبر SheetJS
-- بنية جاهزة للتطوير والإطلاق على Vercel
+واجهة النظام مصممة بالكامل باللغة العربية مع اتجاه RTL، وتم الاهتمام بأن تكون الواجهة واضحة وسلسة للاستخدام اليومي داخل بيئة إدارية.
 
-## المتطلبات
+أهم المميزات
 
-- Node.js 20+
-- مشروع Supabase
-- Vercel أو أي بيئة Node حديثة
+النظام يوفر تسجيل دخول إداري فقط باستخدام Supabase Auth بحيث لا يمكن الوصول للوحة التحكم دون مصادقة.
+يمكن من خلاله إدارة العوائل المسجلة وعدد أفراد كل عائلة، إضافة المواد الغذائية المختلفة مع وحدات القياس الخاصة بها، ثم تنفيذ عملية التوزيع الشهري بطريقة شبه تلقائية اعتماداً على عدد الأفراد أو نوع المادة.
 
-## الإعداد المحلي
+كل عملية توزيع يتم حفظها كسجل تاريخي مستقل (snapshot) حتى لو تغير عدد أفراد العائلة لاحقاً، وبذلك تبقى التقارير السابقة دقيقة ولا تتأثر بالتعديلات المستقبلية.
 
-1. انسخ الملف:
+يتضمن النظام أيضاً صفحة تقارير تسمح بمراجعة عمليات التوزيع السابقة، بالإضافة إلى إمكانية تصدير البيانات إلى Excel سواء بشكل شامل أو حسب العائلة أو حسب الشهر.
 
-```bash
-cp .env.example .env.local
-```
+المتطلبات
 
-2. أضف قيم Supabase داخل `.env.local`.
+المشروع يعمل على بيئة Node.js حديثة (يفضل الإصدار 20 أو أحدث)، ويحتاج إلى مشروع Supabase جاهز لاستخدام قاعدة البيانات والمصادقة.
+يمكن نشره بسهولة على Vercel أو أي منصة تدعم تشغيل تطبيقات Next.js.
 
-3. ثبّت الحزم:
 
-```bash
-npm install
-```
+هيكل المشروع
 
-4. نفّذ SQL داخل Supabase SQL Editor:
+المشروع منظم بحيث تكون صفحات التطبيق داخل مجلد app باستخدام App Router الخاص بـ Next.js.
+واجهة المستخدم والعناصر المشتركة موجودة داخل مجلد components، بينما الكود المسؤول عن الاتصال بقاعدة البيانات والعمليات المساعدة موجود داخل lib.
+العمليات التي تنفذ على الخادم مثل إنشاء التوزيع أو تعديل البيانات موضوعة داخل مجلد server.
 
-- `supabase/schema.sql`
-- `supabase/seed.sql`
+أما ملفات قاعدة البيانات الخاصة بـ Supabase فهي موجودة داخل مجلد supabase وتشمل تعريف الجداول وبعض البيانات
 
-5. أنشئ مستخدم admin من Supabase Auth > Users.
-
-6. عطّل التسجيل العام من:
-
-Authentication → Providers / Settings → Disable signup.
-
-7. شغّل المشروع:
-
-```bash
-npm run dev
-```
-
-## هيكل المجلدات
-
-```text
-app/
-  (auth)/login
-  (dashboard)/dashboard
-  api/export
-components/
-lib/
-server/
-supabase/
-```
-
-## ملاحظات معمارية
-
-- قاعدة البيانات هي المصدر الأساسي للحقيقة.
-- Excel للتصدير والنسخ الاحتياطي والاستيراد الاختياري.
-- `members_count_at_delivery` يتم حفظه داخل السجل الشهري للحفاظ على التاريخ.
-- التعديل على سجل الشهر نفسه يتم عبر `upsert` منطقي على `(family_id, month, year)`.
-- تم فصل التصدير داخل API routes لتسهيل إضافة scheduled backups لاحقاً.
-
-## النشر على Vercel
-
-1. ارفع المشروع إلى GitHub.
-2. اربطه مع Vercel.
-3. أضف متغيرات البيئة نفسها في Vercel.
-4. تأكد من تشغيل SQL على Supabase قبل أول تشغيل.
-5. نفّذ Build Command الافتراضي:
-
-```bash
-npm run build
-```
-
-## تحسينات مقترحة لاحقاً
-
-- استيراد Excel للعوائل والمواد
-- صلاحيات متعددة للأدمن
-- طباعة وصل تسليم
-- Dashboard charts
-- جدولة نسخ احتياطية إلى Supabase Storage أو S3
+ration-distribution-admin/
+├── app/
+│   ├── (auth)/
+│   │   └── login/
+│   │       └── page.tsx
+│   │
+│   ├── (dashboard)/
+│   │   └── dashboard/
+│   │       ├── backups/
+│   │       │   └── page.tsx
+│   │       ├── distribution/
+│   │       │   └── page.tsx
+│   │       ├── families/
+│   │       │   ├── [id]/
+│   │       │   │   └── page.tsx
+│   │       │   ├── new/
+│   │       │   │   └── page.tsx
+│   │       │   ├── actions.ts
+│   │       │   └── page.tsx
+│   │       ├── import/
+│   │       │   └── page.tsx
+│   │       ├── items/
+│   │       │   └── page.tsx
+│   │       ├── reports/
+│   │       │   ├── actions.ts
+│   │       │   └── page.tsx
+│   │       ├── favicon.ico
+│   │       ├── layout.tsx
+│   │       └── page.tsx
+│   │
+│   ├── api/
+│   │   └── export/
+│   │       ├── all/
+│   │       │   └── route.ts
+│   │       ├── family/
+│   │       │   └── [id]/
+│   │       │       └── route.ts
+│   │       └── monthly/
+│   │           └── route.ts
+│   │
+│   ├── globals.css
+│   ├── icon.png
+│   ├── layout.tsx
+│   └── page.tsx
+│
+├── components/
+│   ├── layout/
+│   │   ├── header.tsx
+│   │   └── sidebar.tsx
+│   │
+│   ├── ui/
+│   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── select.tsx
+│   │   ├── table.tsx
+│   │   └── textarea.tsx
+│   │
+│   ├── distribution-client.tsx
+│   ├── empty-state.tsx
+│   ├── export-family-report-button.tsx
+│   ├── family-form.tsx
+│   ├── import-families-client.tsx
+│   ├── item-form.tsx
+│   ├── items-client-table.tsx
+│   ├── report-export-buttons.tsx
+│   └── stat-card.tsx
+│
+├── lib/
+│   ├── supabase/
+│   │   ├── admin.ts
+│   │   ├── client.ts
+│   │   ├── middleware.ts
+│   │   └── server.ts
+│   │
+│   ├── auth.ts
+│   ├── constants.ts
+│   ├── db.ts
+│   ├── excel-reports.ts
+│   ├── excel.ts
+│   ├── types.ts
+│   ├── utils.ts
+│   └── validations.ts
+│
+├── server/
+│   ├── auth-actions.ts
+│   ├── distribution-actions.ts
+│   ├── family-actions.ts
+│   ├── import-actions.ts
+│   └── item-actions.ts
+│
+├── supabase/
+│   ├── schema.sql
+│   └── seed.sql
+│
+├── .env.example
+├── .gitignore
+├── eslint.config.mjs
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── README.md
+├── tailwind.config.ts
+└── tsconfig.json
