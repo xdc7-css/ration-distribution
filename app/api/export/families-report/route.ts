@@ -35,10 +35,42 @@ function formatTime(dateString?: string | null) {
 function formatDate(dateString?: string | null) {
   if (!dateString) return "";
   const d = new Date(dateString);
-  const year = d.getFullYear();
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
-  return `${year}/${month}/${day}`;
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+type FamilyRow = {
+  id?: string;
+  family_code?: string;
+  family_name?: string;
+  area?: string | null;
+  phone?: string | null;
+  members_count?: number | null;
+  is_active?: boolean | null;
+};
+
+type DistributionItemRow = {
+  item_name_snapshot?: string | null;
+  unit_snapshot?: string | null;
+  delivered_quantity?: number | null;
+  calculated_quantity?: number | null;
+};
+
+type DistributionRow = {
+  id: string;
+  month: number;
+  year: number;
+  members_count_at_delivery?: number | null;
+  notes?: string | null;
+  created_at?: string | null;
+  families?: FamilyRow[] | FamilyRow | null;
+  monthly_distribution_items?: DistributionItemRow[] | null;
+};
+
+function getFamily(record: DistributionRow): FamilyRow | null {
+  if (!record.families) return null;
+  return Array.isArray(record.families)
+    ? (record.families[0] ?? null)
+    : record.families;
 }
 
 export async function GET() {
@@ -79,14 +111,16 @@ export async function GET() {
     return new NextResponse(error.message, { status: 500 });
   }
 
-  const grouped = new Map<string, any[]>();
+  const grouped = new Map<string, DistributionRow[]>();
 
-  for (const record of data ?? []) {
-    const familyId = record.families?.id;
+  for (const rawRecord of (data ?? []) as DistributionRow[]) {
+    const family = getFamily(rawRecord);
+    const familyId = family?.id;
+
     if (!familyId) continue;
 
     if (!grouped.has(familyId)) grouped.set(familyId, []);
-    grouped.get(familyId)!.push(record);
+    grouped.get(familyId)!.push(rawRecord);
   }
 
   const workbook = new ExcelJS.Workbook();
@@ -94,9 +128,11 @@ export async function GET() {
   workbook.created = new Date();
 
   for (const [, records] of grouped) {
-    const family = records[0].families;
+    const family = getFamily(records[0]);
+    if (!family) continue;
+
     const sheet = workbook.addWorksheet(
-      safeSheetName(`${family.family_name} - ${family.family_code}`)
+      safeSheetName(`${family.family_name ?? "عائلة"} - ${family.family_code ?? ""}`)
     );
 
     sheet.views = [{ rightToLeft: true, state: "frozen", ySplit: 5 }];
@@ -112,7 +148,7 @@ export async function GET() {
     ];
 
     sheet.mergeCells("A1:F1");
-    sheet.getCell("A1").value = `سجل العائلة - ${family.family_name}`;
+    sheet.getCell("A1").value = `سجل العائلة - ${family.family_name ?? ""}`;
     sheet.getCell("A1").font = { bold: true, size: 16 };
     sheet.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
     sheet.getCell("A1").fill = {
@@ -188,7 +224,6 @@ export async function GET() {
         left: { style: "thin", color: { argb: "FF9E9E9E" } },
         right: { style: "thin", color: { argb: "FF9E9E9E" } },
       };
-
       cell.fill = {
         type: "pattern",
         pattern: "solid",
