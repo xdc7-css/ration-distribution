@@ -1,20 +1,50 @@
-import { cn } from "@/lib/utils";
+import * as React from "react";
 
-export function Table({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) {
-  return <table className={cn("w-full caption-bottom text-sm", className)} {...props} />;
+type TableProps = React.TableHTMLAttributes<HTMLTableElement>;
+type SectionProps = React.HTMLAttributes<HTMLTableSectionElement>;
+type RowProps = React.HTMLAttributes<HTMLTableRowElement>;
+type CellProps = React.ThHTMLAttributes<HTMLTableCellElement>;
+type TDProps = React.TdHTMLAttributes<HTMLTableCellElement>;
+
+export function Table({ className = "", ...props }: TableProps) {
+  return (
+    <div className="w-full overflow-x-auto rounded-[24px] border border-slate-200/70 bg-white">
+      <table className={`w-full min-w-[760px] text-sm ${className}`} {...props} />
+    </div>
+  );
 }
-export function THead({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
+
+export function THead({ className = "", ...props }: SectionProps) {
+  return <thead className={`bg-slate-50 ${className}`} {...props} />;
 }
-export function TBody({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />;
+
+export function TBody({ className = "", ...props }: SectionProps) {
+  return <tbody className={className} {...props} />;
 }
-export function TR({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cn("border-b transition-colors hover:bg-white/40", className)} {...props} />;
+
+export function TR({ className = "", ...props }: RowProps) {
+  return (
+    <tr
+      className={`border-b border-slate-200 last:border-b-0 ${className}`}
+      {...props}
+    />
+  );
 }
-export function TH({ className, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn("h-12 px-4 text-right align-middle font-medium text-muted-foreground", className)} {...props} />;
+
+export function TH({ className = "", ...props }: CellProps) {
+  return (
+    <th
+      className={`px-4 py-4 text-right font-semibold text-slate-600 ${className}`}
+      {...props}
+    />
+  );
 }
-export function TD({ className, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn("p-4 align-middle", className)} {...props} />;
+
+export function TD({ className = "", ...props }: TDProps) {
+  return (
+    <td
+      className={`px-4 py-4 align-middle text-slate-700 ${className}`}
+      {...props}
+    />
+  );
 }

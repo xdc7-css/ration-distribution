@@ -7,7 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatNumber(value: number | string | null | undefined) {
   const num = Number(value ?? 0);
-  return new Intl.NumberFormat("ar-IQ", { maximumFractionDigits: 2 }).format(num);
+  return new Intl.NumberFormat("ar-IQ", {
+    maximumFractionDigits: 2,
+  }).format(num);
 }
 
 export function getCurrentMonthYear() {
@@ -16,16 +18,16 @@ export function getCurrentMonthYear() {
 }
 
 export const monthOptions = [
-  "كانون الثاني",
-  "شباط",
-  "آذار",
-  "نيسان",
-  "أيار",
-  "حزيران",
-  "تموز",
-  "آب",
-  "أيلول",
-  "تشرين الأول",
-  "تشرين الثاني",
-  "كانون الأول",
+  "1 — كانون الثاني",
+  "2 — شباط",
+  "3 — آذار",
+  "4 — نيسان",
+  "5 — أيار",
+  "6 — حزيران",
+  "7 — تموز",
+  "8 — آب",
+  "9 — أيلول",
+  "10 — تشرين الأول",
+  "11 — تشرين الثاني",
+  "12 — كانون الأول",
 ];

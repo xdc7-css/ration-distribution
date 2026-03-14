@@ -13,7 +13,12 @@ const initialState = { error: "", success: "" };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-  return <Button type="submit">{pending ? "جارٍ الحفظ..." : "حفظ العائلة"}</Button>;
+
+  return (
+    <Button type="submit" className="w-full sm:w-auto">
+      {pending ? "جارٍ الحفظ..." : "حفظ العائلة"}
+    </Button>
+  );
 }
 
 export function FamilyForm({
@@ -26,14 +31,15 @@ export function FamilyForm({
   const [state, formAction] = useActionState(upsertFamilyAction, initialState);
 
   return (
-    <Card>
+    <Card className="rounded-3xl border border-white/60 bg-white/75 shadow-sm backdrop-blur">
       <CardHeader>
         <CardTitle>{family?.id ? "تعديل العائلة" : "إضافة عائلة"}</CardTitle>
       </CardHeader>
+
       <CardContent>
-        <form action={formAction} className="grid gap-4 md:grid-cols-2">
+        <form action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="id" defaultValue={family?.id} />
-          
+
           <div>
             <label className="mb-2 block text-sm font-medium">رمز العائلة</label>
             <Input name="family_code" defaultValue={family?.family_code} required />
@@ -60,12 +66,12 @@ export function FamilyForm({
             <Input name="phone" defaultValue={family?.phone ?? ""} />
           </div>
 
-          <div>
+          <div className="sm:col-span-2">
             <label className="mb-2 block text-sm font-medium">المنطقة</label>
             <Input name="area" defaultValue={family?.area ?? ""} />
           </div>
 
-          <div className="flex items-center gap-2 pt-8">
+          <div className="sm:col-span-2 flex items-center gap-2">
             <input
               id="is_active"
               name="is_active"
@@ -78,20 +84,20 @@ export function FamilyForm({
             </label>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label className="mb-2 block text-sm font-medium">ملاحظات</label>
             <Textarea name="notes" defaultValue={family?.notes ?? ""} />
           </div>
 
           {state.error ? (
-            <p className="text-sm text-red-600 md:col-span-2">{state.error}</p>
+            <p className="text-sm text-red-600 sm:col-span-2">{state.error}</p>
           ) : null}
 
           {state.success ? (
-            <p className="text-sm text-emerald-600 md:col-span-2">{state.success}</p>
+            <p className="text-sm text-emerald-600 sm:col-span-2">{state.success}</p>
           ) : null}
 
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <SubmitButton />
           </div>
         </form>

@@ -8,10 +8,12 @@ export const metadata: Metadata = {
   description: "نظام إداري خاص لتوزيع المواد الغذائية",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body>
+      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         {children}
         <Toaster richColors position="top-center" />
       </body>
